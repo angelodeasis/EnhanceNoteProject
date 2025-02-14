@@ -12,7 +12,7 @@ app.use(express.urlencoded({extended: false}));
 // Use EJS as view engine
 app.set('view engine', 'ejs');
 
-app.use(express.static("./images"));
+app.use(express.static("./images")); // must declare static folder in order to use (images)
 
 // Static file (Linking CSS sheet to our EJS files)
 app.use(express.static("public"));
