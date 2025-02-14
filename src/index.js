@@ -12,10 +12,14 @@ app.use(express.urlencoded({extended: false}));
 // Use EJS as view engine
 app.set('view engine', 'ejs');
 
+app.use(express.static("./images"));
+
 // Static file (Linking CSS sheet to our EJS files)
 app.use(express.static("public"));
 
-// app.get('/' (req, res) => {}); (THIS WILL BE USED LATER)
+app.get('/', (req, res) => {
+    res.render("home");
+}); //(THIS WILL BE USED LATER)
 
 app.get('/login', (req, res) => { // Login request/respond function
     res.render("login");
