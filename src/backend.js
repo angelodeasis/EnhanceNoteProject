@@ -29,18 +29,24 @@ function qna(str) {
   let answer;
   let input = str;
   let output;
+  //console.log(typeof input)
   while (input.includes("Q:")){
    string = input.split("Q: ");
    question = string[1].split("\n");
    qArray.push(question[0]);
    input = question[1];
+   //console.log(typeof input)
   }
-
+  //console.log(typeof input)
+  input = str;
   while (input.includes("A:")){
+    //console.log(input + "\n This is the end of input 1.")
     string = input.split("A: ");
-    answer = string[1].split("\n");
+    answer = string[1].split("\n", 2);
     aArray.push(answer[0]);
     input = answer[1];
+    console.log(answer[0])
+    console.log("\n" + input + "\n")
    }
   output = [qArray, aArray]
   return output;
