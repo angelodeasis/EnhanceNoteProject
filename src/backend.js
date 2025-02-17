@@ -32,6 +32,8 @@ function qna(str) {
   //console.log(typeof input)
   while (input.includes("Q:")){
    string = input.split("Q: ");
+   // IDEA FOR A MACHINE WITH NODE.JS: for i in range len(string): question = string[i].split("\n")
+   // q.Array.push(question)
    question = string[1].split("\n");
    console.log(string + "\n")
    qArray.push(question[0]);
