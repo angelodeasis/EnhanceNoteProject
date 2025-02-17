@@ -33,9 +33,11 @@ function qna(str) {
   while (input.includes("Q:")){
    string = input.split("Q: ");
    question = string[1].split("\n");
+   console.log(string + "\n")
    qArray.push(question[0]);
-   input = question[1];
-   //console.log(typeof input)
+   input = string[1];
+   console.log(input)
+   console.log(qArray)
   }
   //console.log(typeof input)
   input = str;
@@ -44,9 +46,9 @@ function qna(str) {
     string = input.split("A: ");
     answer = string[1].split("\n", 2);
     aArray.push(answer[0]);
-    input = answer[1];
-    console.log(answer[0])
-    console.log("\n" + input + "\n")
+    input = string[1];
+    //console.log(answer[0])
+    //console.log("\n" + input + "\n")
    }
   output = [qArray, aArray]
   return output;
@@ -59,6 +61,6 @@ let arrayOut;
 arrayOut = qna(inputString)
 qList = arrayOut[0];
 aList = arrayOut[1];
-console.log(arrayOut);
-console.log(qList);
-console.log(aList);
+//console.log(arrayOut);
+//console.log(qList);
+//console.log(aList);
