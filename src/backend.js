@@ -25,35 +25,25 @@ function qna(str) {
   let qArray = [];
   let aArray = [];
   let string;
-  let question;
-  let answer;
-  let input = str;
   let output;
-  //console.log(typeof input)
-  while (input.includes("Q:")){
-   string = input.split("Q: ");
-   // IDEA FOR A MACHINE WITH NODE.JS: for i in range len(string){question = string[i].split("\n")}
-   // for j in range len(question){q.Array.push(j)}
-   // q.Array.push(question)
-   question = string[1].split("\n");
-   console.log(string + "\n")
-   qArray.push(question[0]);
-   input = string[1];
-   console.log(input)
-   console.log(qArray)
+  // Removing question and answer labels (python holdover)
+  str = str.replaceAll("Q:", "");
+  str = str.replaceAll("A:", "");
+  // Splitting string at newlines
+  string = str.split("\n");
+  // Pushing questions to question list, other strings to answer list
+  for (let i = 0; i < string.length; i++) {
+    if (string[i].includes("?")){
+      qArray.push(string[i]);
+    }
+    else {
+      aArray.push(string[i])
+    }
   }
-  //console.log(typeof input)
-  input = str;
-  while (input.includes("A:")){
-    //console.log(input + "\n This is the end of input 1.")
-    string = input.split("A: ");
-    answer = string[1].split("\n", 2);
-    aArray.push(answer[0]);
-    input = string[1];
-    //console.log(answer[0])
-    //console.log("\n" + input + "\n")
-   }
-  output = [qArray, aArray]
+  // Removing potential label strings from answer list
+  aArray.splice(0, 1);
+  //aArray.splice(aArray.length - 1, 1)
+  output = [qArray, aArray];
   return output;
 }
 
@@ -65,5 +55,5 @@ arrayOut = qna(inputString)
 qList = arrayOut[0];
 aList = arrayOut[1];
 //console.log(arrayOut);
-//console.log(qList);
-//console.log(aList);
+console.log(qList);
+console.log(aList);
