@@ -29,6 +29,11 @@ app.get('/signup', (req, res) => { // Sign-up request/respond function
     res.render("signup");
 });
 
+app.get('/pricing', (req, res) => { // Sign-up request/respond function
+    res.render("pricing");
+});
+
+
 // Registering User
 app.post('/signup', async (req, res) => {
     const data = {
