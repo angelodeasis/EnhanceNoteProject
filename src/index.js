@@ -4,8 +4,6 @@ const bcrypt = require("bcrypt"); // bcrypt model imported
 const collection = require("./config"); 
 const backend = require("./backend");
 const multer = require("multer")
-
-
 const app = express(); // Creates express application
 
 // JSON Data conversion
