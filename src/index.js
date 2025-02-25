@@ -76,7 +76,8 @@ let storage = multer.diskStorage({
 
 
 // Backend for Handling PDF
-
+// NEEDS TO BE FIXED // 
+// Should we add a loading screen to correctly parse the pdf file? 
 app.post('flashcards', function(req, res) {
     var pdf;
     pdf = upload;
