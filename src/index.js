@@ -35,7 +35,7 @@ app.get('/signup', (req, res) => { // Sign-up request/respond function
     res.render("signup");
 });
 
-app.get('/pricing', (req, res) => { // Sign-up request/respond function
+app.get('/pricing', (req, res) => { // pricing route
     res.render("pricing");
 });
 
@@ -70,6 +70,27 @@ let storage = multer.diskStorage({
         if(err) {
             return res.status(500).send("Error uploading file" + err);
         }
+
+        const uploadedFilePath = path.join(uploadDir, req.file.filename);
+
+        // Do whatever you need to do with the file (e.g., processing or sending it back to the user)
+        // David's Backend should go here
+
+
+
+        // Backend end
+        // Example: Here we can delete the file after use.
+
+        // Delete the file after use (e.g., after sending the response or processing)
+        fs.unlink(uploadedFilePath, function(deleteErr) {
+            if (deleteErr) {
+                console.log('Error deleting file:', deleteErr);
+            } else {
+                console.log('File deleted successfully.');
+            }
+        });
+
+
         res.render("flashcards")
     });
   });
