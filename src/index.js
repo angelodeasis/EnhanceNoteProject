@@ -1,10 +1,14 @@
 const express = require("express"); // express model imported
-const pasth = require("path"); // built-in path module imported
+const path = require("path"); // built-in path module imported
 const bcrypt = require("bcrypt"); // bcrypt model imported
 const collection = require("./config"); 
-const backend = require("./backend");
+// const backend = require("./backend");
 const multer = require("multer")
 const app = express(); // Creates express application
+const Groq = require('groq-sdk');
+
+
+
 
 // JSON Data conversion
 app.use(express.json());
@@ -36,12 +40,44 @@ app.get('/pricing', (req, res) => { // Sign-up request/respond function
 
 
 // File upload
-app.post('/home', async (req, res) => { 
-    var pdf;
-    pdf = $("uploader").val();
+let storage = multer.diskStorage({
+    destination: function(req, file, callback) {
+        callback(null, './uploads')
+    },
+    filename: function(req, file, callback) {
+        console.log(file)
+        callback(null, file.originalname);
+    }
+   })
+ 
+   app.get('/', function(req, res) {
+    res.render('index')
+   })
+ 
+  app.post('/', function(req, res) {
+    let upload = multer({
+        storage: storage,
+        fileFilter: function(req, file, callback) {
+            let ext = path.extname(file.originalname)
+            if (ext !== '.pdf') {
+                return callback(res.end('Only pdf files are allowed'), null)
+            }
+            callback(null, true)
+        }
+    }).single('userFile');
+    upload(req, res, function(err) {
+        if(err) {
+            return res.status(500).send("Error uploading file" + err);
+        }
+        res.render("flashcards")
+    });
+  });
 
 
-});
+// Backend for Handling PDF
+
+
+
 
 // Registering User
 app.post('/signup', async (req, res) => {

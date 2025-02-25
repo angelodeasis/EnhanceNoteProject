@@ -47,10 +47,11 @@
             <h2>Upload Your PDF</h2>
             <p>Select a PDF to convert it into interactive flashcards. You can also drag and drop a file.</p>
             
-            <div class="upload-box mx-auto" id="uploader">
-                <form>
+            <div class="upload-box mx-auto">
+                <form id="uploader" method="post" enctype="multipart/form-data">
                     <label for="fileInput" class="btn btn-outline-primary">Select a File</label>
-                    <input type="file" id="fileInput" name="fileName" hidden>
+                    <input type="file" id="fileInput" name="userFile" hidden>
+                    <input type="submit" value="submit">
                 </form>
                 <p class="mt-2 text-muted">Your files are securely processed by ADE TECH's AI.</p>
             </div>

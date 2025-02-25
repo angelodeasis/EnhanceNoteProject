@@ -1,8 +1,8 @@
 import Groq from 'groq-sdk';
+import { isEmptyObj } from 'groq-sdk/core.mjs';
 
 var pdf;
-
-
+// if PDF is loaded, then:
 const groq = new Groq({
   apiKey: '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',
 });
@@ -19,7 +19,11 @@ async function runModel() {
   }
 }
 
-runModel();
+while(pdf != isEmptyObj()) {
+
+  runModel();
+};
+
 
 function qna(str) {
   let qArray = [];
