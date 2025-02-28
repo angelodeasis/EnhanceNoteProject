@@ -8,3 +8,13 @@ This project is primarly meant to:
 - Obtain an image/set of notes
 - Reorganize or reformat notes
 - Help user study
+
+
+This is only the first version of the program, made as a Flashcard conversion PDF website.
+
+
+To run:
+
+* npm install nodemon
+* Install all required dependencies
+* In terminal, run: nodemon src/index.js
