@@ -1,6 +1,7 @@
 .tool-text-4xl {
   background-image: linear-gradient(to right, #11456d, #269bf4);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 50px;
 }
@@ -11,7 +12,7 @@ body {
 }
 
 header {
-  background: linear-gradient(135deg, #f4f4f4, #e3e3e3);
+  background: linear-gradient(135deg, #e3fdfd, #ffe6fa);
   
 }
 h1{
@@ -98,3 +99,30 @@ footer {
   align-items: center;
   gap: 15px;
 }
+
+
+
+
+body {
+  background: linear-gradient(135deg, #e3fdfd, #ffe6fa);
+}
+header h1, header p {
+  animation: fadeIn 1s ease;
+}
+
+@keyframes fadeIn {
+  0% {
+      opacity: 0;
+      transform: translateY(-20px);
+  }
+  100% {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}
+.upload-box:hover {
+  box-shadow: 0 0 15px rgba(0, 123, 255, 0.3);
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
