@@ -74,7 +74,8 @@ let storage = multer.diskStorage({
         const uploadedFilePath = path.join(uploadDir, req.file.filename);
 
         // Do whatever you need to do with the file (e.g., processing or sending it back to the user)
-        // David's Backend should go here
+        // Convert file into string for function input here
+        // File can be deleted after conversion to string
 
 
 
@@ -104,6 +105,32 @@ app.post('flashcards', function(req, res) {
     pdf = upload;
     console.log(pdf);
 
+    function qna(str) {
+        let qArray = [];
+        let aArray = [];
+        let string;
+        let output;
+        // Removing question and answer labels (python holdover)
+        str = str.replaceAll("Q:", "");
+        str = str.replaceAll("A:", "");
+        // Splitting string at newlines
+        string = str.split("\n");
+        // Pushing questions to question list, other strings to answer list
+        for (let i = 0; i < string.length; i++) {
+          if (string[i].includes("?")){
+            qArray.push(string[i]);
+          }
+          else {
+            aArray.push(string[i])
+          }
+        }
+        // Removing potential label strings from answer list
+        aArray.splice(0, 1);
+        //aArray.splice(aArray.length - 1, 1)
+        output = [qArray, aArray];
+        return output;
+      }
+
     const groq = new Groq({
       apiKey: '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',
     });
@@ -114,43 +141,21 @@ app.post('flashcards', function(req, res) {
           model: 'mixtral-8x7b-32768',
           messages: [{ role: 'user', content: `Read the name of the PDF variable provided: ${pdf}` }],
         });
+        // let str = console.log(chatCompletion.choices[0].message.content);
+        // return str
         console.log(chatCompletion.choices[0].message.content); 
       } catch (error) {
         console.error('Error:', error);
       }
     }
-    
+    // Change condition? PDF may be empty very quickly
     while(pdf != isEmptyObj()) {
     
       runModel();
+      //str = runModel();
+      //qna(str);
     };
     
-    
-    function qna(str) {
-      let qArray = [];
-      let aArray = [];
-      let string;
-      let output;
-      // Removing question and answer labels (python holdover)
-      str = str.replaceAll("Q:", "");
-      str = str.replaceAll("A:", "");
-      // Splitting string at newlines
-      string = str.split("\n");
-      // Pushing questions to question list, other strings to answer list
-      for (let i = 0; i < string.length; i++) {
-        if (string[i].includes("?")){
-          qArray.push(string[i]);
-        }
-        else {
-          aArray.push(string[i])
-        }
-      }
-      // Removing potential label strings from answer list
-      aArray.splice(0, 1);
-      //aArray.splice(aArray.length - 1, 1)
-      output = [qArray, aArray];
-      return output;
-    }
     
     let inputString = "Here are the study questions and answers based on the notes:\nQ: How does the film portray the human cost of war, particularly through the lens of children?\nA: The film portrays the human cost of war brutally and realistically, showing the intense shock and trauma of losing family at a young age.\nQ: What do we see through the lens of children in the film?\nA: We see the unnecessary death toll of war, as well as the possibility of losing family without warning or preparation, which is life-changing for young children."
     let qList;
