@@ -7,6 +7,8 @@ const collection = require("./config");
 const multer = require("multer")
 const app = express(); // Creates express application
 const Groq = require('groq-sdk');
+const FileReader = require('FileReader');
+const pdfIn = require('pdfjs-dist');
 
 
 
@@ -39,6 +41,50 @@ app.get('/pricing', (req, res) => { // pricing route
     res.render("pricing");
 });
 
+// PDF Reader Function
+async function readPdfText(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+  
+      reader.onload = async function(event) {
+        try {
+          const typedArray = new Uint8Array(event.target.result);
+          const pdf = await pdfjsLib.getDocument(typedArray).promise;
+          let fullText = "";
+  
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(" ");
+            fullText += pageText + "\n";
+          }
+          resolve(fullText);
+        } catch (error) {
+          reject(error);
+        }
+      };
+  
+      reader.onerror = function(error) {
+        reject(error);
+      };
+  
+      reader.readAsArrayBuffer(file);
+    });
+  }
+  
+  // Example usage:
+  const fileInput = document.getElementById('pdf-file');
+  fileInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      try {
+        const pdfText = await readPdfText(file);
+        console.log(pdfText);
+      } catch (error) {
+        console.error("Error reading PDF:", error);
+      }
+    }
+  });
 
 // File upload
 let storage = multer.diskStorage({
@@ -76,7 +122,7 @@ let storage = multer.diskStorage({
         // Do whatever you need to do with the file (e.g., processing or sending it back to the user)
         // Convert file into string for function input here
         // File can be deleted after conversion to string
-
+        // readPdfText()
 
 
         // Backend end
