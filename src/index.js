@@ -9,6 +9,7 @@ const app = express(); // Creates express application
 const Groq = require('groq-sdk');
 const FileReader = require('FileReader');
 const pdfIn = require('pdfjs-dist');
+const fs = require('fs');
 
 
 
@@ -73,7 +74,13 @@ async function readPdfText(file) {
   }
   
   // Example usage:
-  const fileInput = document.getElementById('pdf-file');
+  const uploads = './uploads/';
+  let inputFile;
+  fs.readdirSync(uploads).forEach(file => {
+    inputFile = file;
+  })
+
+  const fileInput = inputFile;
   fileInput.addEventListener('change', async (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -122,7 +129,7 @@ let storage = multer.diskStorage({
         // Do whatever you need to do with the file (e.g., processing or sending it back to the user)
         // Convert file into string for function input here
         // File can be deleted after conversion to string
-        // readPdfText()
+        let readPDF = Text(uploadedFilePath);
 
 
         // Backend end
@@ -136,9 +143,8 @@ let storage = multer.diskStorage({
                 console.log('File deleted successfully.');
             }
         });
-
-
         res.render("flashcards")
+        return readPDF;
     });
   });
 
@@ -194,22 +200,20 @@ app.post('flashcards', function(req, res) {
         console.error('Error:', error);
       }
     }
-    // Change condition? PDF may be empty very quickly
-    while(pdf != isEmptyObj()) {
-    
-      runModel();
-      //str = runModel();
-      //qna(str);
+    let inputStr;
+    let arrayOut;
+    let qList;
+    let aList;
+    // Runs if PDF input isn't empty
+    if(pdf != isEmptyObj()) {
+      inputStr = runModel(pdf);
+      arrayOut = qna(inputStr);
+      qList = arrayOut[0];
+      aList = arrayOut[1];
     };
     
     
-    let inputString = "Here are the study questions and answers based on the notes:\nQ: How does the film portray the human cost of war, particularly through the lens of children?\nA: The film portrays the human cost of war brutally and realistically, showing the intense shock and trauma of losing family at a young age.\nQ: What do we see through the lens of children in the film?\nA: We see the unnecessary death toll of war, as well as the possibility of losing family without warning or preparation, which is life-changing for young children."
-    let qList;
-    let aList;
-    let arrayOut;
-    arrayOut = qna(inputString)
-    qList = arrayOut[0];
-    aList = arrayOut[1];
+    //let inputString = "Here are the study questions and answers based on the notes:\nQ: How does the film portray the human cost of war, particularly through the lens of children?\nA: The film portrays the human cost of war brutally and realistically, showing the intense shock and trauma of losing family at a young age.\nQ: What do we see through the lens of children in the film?\nA: We see the unnecessary death toll of war, as well as the possibility of losing family without warning or preparation, which is life-changing for young children."
     //console.log(arrayOut);
     console.log(qList);
     console.log(aList);
