@@ -152,15 +152,16 @@ app.post('flashcards', function(req, res) {
       apiKey: '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',
     });
     
-    async function runModel() {
+    async function runModel(pdf) {
       try {
         const chatCompletion = await groq.chat.completions.create({
           model: 'mixtral-8x7b-32768',
           messages: [{ role: 'user', content: `Read the name of the PDF variable provided: ${pdf}` }],
+          //`Create a list of study questions and answers from the provided text: ${pdf}`
         });
-        // let str = console.log(chatCompletion.choices[0].message.content);
-        // return str
         console.log(chatCompletion.choices[0].message.content); 
+        let str = chatCompletion.choices[0].message.content;
+        return str
       } catch (error) {
         console.error('Error:', error);
       }
@@ -169,7 +170,7 @@ app.post('flashcards', function(req, res) {
     let arrayOut;
     let qList;
     let aList;
-    // Change condition? PDF may be empty very quickly
+    // If pdfString is loaded properly, groq and qna will be run
     if(typeof pdfString == "string") {
       pdfOut = runModel();
       arrayOut = qna(pdfOut);
@@ -181,7 +182,7 @@ app.post('flashcards', function(req, res) {
     };
     
     
-    let inputString = "Here are the study questions and answers based on the notes:\nQ: How does the film portray the human cost of war, particularly through the lens of children?\nA: The film portrays the human cost of war brutally and realistically, showing the intense shock and trauma of losing family at a young age.\nQ: What do we see through the lens of children in the film?\nA: We see the unnecessary death toll of war, as well as the possibility of losing family without warning or preparation, which is life-changing for young children."
+    //let inputString = "Here are the study questions and answers based on the notes:\nQ: How does the film portray the human cost of war, particularly through the lens of children?\nA: The film portrays the human cost of war brutally and realistically, showing the intense shock and trauma of losing family at a young age.\nQ: What do we see through the lens of children in the film?\nA: We see the unnecessary death toll of war, as well as the possibility of losing family without warning or preparation, which is life-changing for young children."
     //console.log(arrayOut);
 
 
