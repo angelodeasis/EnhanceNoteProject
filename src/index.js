@@ -7,7 +7,6 @@ const collection = require("./config");
 const multer = require("multer")
 const app = express(); // Creates express application
 const Groq = require('groq-sdk');
-const FileReader = require('FileReader');
 const pdfIn = require('pdfjs-dist');
 
 
@@ -40,52 +39,7 @@ app.get('/signup', (req, res) => { // Sign-up request/respond function
 app.get('/pricing', (req, res) => { // pricing route
     res.render("pricing");
 });
-
-// PDF Reader Function
-async function readPdfText(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
   
-      reader.onload = async function(event) {
-        try {
-          const typedArray = new Uint8Array(event.target.result);
-          const pdf = await pdfjsLib.getDocument(typedArray).promise;
-          let fullText = "";
-  
-          for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
-            const pageText = textContent.items.map(item => item.str).join(" ");
-            fullText += pageText + "\n";
-          }
-          resolve(fullText);
-        } catch (error) {
-          reject(error);
-        }
-      };
-  
-      reader.onerror = function(error) {
-        reject(error);
-      };
-  
-      reader.readAsArrayBuffer(file);
-    });
-  }
-  
-  // Example usage:
-  const fileInput = document.getElementById('pdf-file');
-  fileInput.addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      try {
-        const pdfText = await readPdfText(file);
-        console.log(pdfText);
-      } catch (error) {
-        console.error("Error reading PDF:", error);
-      }
-    }
-  });
-
 // File upload
 let storage = multer.diskStorage({
     destination: function(req, file, callback) {
@@ -101,6 +55,19 @@ let storage = multer.diskStorage({
     res.render('index')
    })
  
+   async function readPdf(url) {
+    const pdf = await pdfIn.getDocument(url).promise;
+    let fullText = "";
+  
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => item.str).join(" ");
+      fullText += pageText + "\n";
+    }
+    return fullText;
+  }
+
   app.post('/', function(req, res) {
     let upload = multer({
         storage: storage,
@@ -112,6 +79,9 @@ let storage = multer.diskStorage({
             callback(null, true)
         }
     }).single('userFile');
+
+    let pdfString = 0;
+
     upload(req, res, function(err) {
         if(err) {
             return res.status(500).send("Error uploading file" + err);
@@ -122,7 +92,7 @@ let storage = multer.diskStorage({
         // Do whatever you need to do with the file (e.g., processing or sending it back to the user)
         // Convert file into string for function input here
         // File can be deleted after conversion to string
-        // readPdfText()
+        pdfString = readPdf('./uploads');
 
 
         // Backend end
@@ -139,6 +109,7 @@ let storage = multer.diskStorage({
 
 
         res.render("flashcards")
+        return pdfString;
     });
   });
 
@@ -194,17 +165,19 @@ app.post('flashcards', function(req, res) {
         console.error('Error:', error);
       }
     }
+    let pdfOut;
     let arrayOut;
     let qList;
     let aList;
     // Change condition? PDF may be empty very quickly
-    while(pdf != isEmptyObj()) {
-    
-      runModel();
-      //str = runModel();
-      //arrayOut = qna(str);
-      //qList = arrayOut[0];
-      //aList = arrayOut[1];
+    if(typeof pdfString == "string") {
+      pdfOut = runModel();
+      arrayOut = qna(str);
+      qList = arrayOut[0];
+      aList = arrayOut[1];
+    }
+    else {
+      console.log("Error: No PDF detected");
     };
     
     
