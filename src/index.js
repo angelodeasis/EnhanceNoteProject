@@ -156,8 +156,8 @@ app.post('flashcards', function(req, res) {
       try {
         const chatCompletion = await groq.chat.completions.create({
           model: 'mixtral-8x7b-32768',
-          messages: [{ role: 'user', content: `Read the name of the PDF variable provided: ${pdf}` }],
-          //`Create a list of study questions and answers from the provided text: ${pdf}`
+          messages: [{ role: 'user', content: `Create a list of study questions and answers from the provided text: ${pdf}` }],
+          //`Read the name of the PDF variable provided: ${pdf}`
         });
         console.log(chatCompletion.choices[0].message.content); 
         let str = chatCompletion.choices[0].message.content;
