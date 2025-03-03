@@ -174,6 +174,7 @@ app.post('flashcards', function(req, res) {
     if(typeof pdfString == "string") {
       pdfOut = runModel();
       arrayOut = qna(pdfOut);
+      // ARRAYS FOR USE IN NOTECARDS
       qList = arrayOut[0];
       aList = arrayOut[1];
     }
