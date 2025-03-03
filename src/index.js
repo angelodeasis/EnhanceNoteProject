@@ -194,25 +194,22 @@ app.post('flashcards', function(req, res) {
         console.error('Error:', error);
       }
     }
+    let arrayOut;
+    let qList;
+    let aList;
     // Change condition? PDF may be empty very quickly
     while(pdf != isEmptyObj()) {
     
       runModel();
       //str = runModel();
-      //qna(str);
+      //arrayOut = qna(str);
+      //qList = arrayOut[0];
+      //aList = arrayOut[1];
     };
     
     
     let inputString = "Here are the study questions and answers based on the notes:\nQ: How does the film portray the human cost of war, particularly through the lens of children?\nA: The film portrays the human cost of war brutally and realistically, showing the intense shock and trauma of losing family at a young age.\nQ: What do we see through the lens of children in the film?\nA: We see the unnecessary death toll of war, as well as the possibility of losing family without warning or preparation, which is life-changing for young children."
-    let qList;
-    let aList;
-    let arrayOut;
-    arrayOut = qna(inputString)
-    qList = arrayOut[0];
-    aList = arrayOut[1];
     //console.log(arrayOut);
-    console.log(qList);
-    console.log(aList);
 
 
 });
