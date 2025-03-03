@@ -172,7 +172,7 @@ app.post('flashcards', function(req, res) {
     // Change condition? PDF may be empty very quickly
     if(typeof pdfString == "string") {
       pdfOut = runModel();
-      arrayOut = qna(str);
+      arrayOut = qna(pdfOut);
       qList = arrayOut[0];
       aList = arrayOut[1];
     }
