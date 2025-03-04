@@ -9,6 +9,8 @@ const app = express(); // Creates express application
 const Groq = require('groq-sdk');
 const pdfIn = require('pdfjs-dist');
 const uploadDir = path.join(__dirname, '../uploads'); // Go up one level
+const fs = require('fs');
+
 
 
 
@@ -105,7 +107,9 @@ let storage = multer.diskStorage({
             console.log("Extracted Text from PDF:", pdfString);  // Debugging output
 
             // Send extracted text to AI model
-            const groq = new Groq({ apiKey: sk-abcdef1234567890 });
+            const groq = new Groq({
+                apiKey: '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' // Make sure the key is in quotes
+            });
             const chatCompletion = await groq.chat.completions.create({
                 model: 'mixtral-8x7b-32768',
                 messages: [{ role: 'user', content: `Create a list of study questions and answers from this text: ${pdfString}` }]
@@ -142,7 +146,8 @@ let storage = multer.diskStorage({
             });
 
             // Render flashcards.ejs with Q&A data
-            res.render("flashcards", { flashcards });
+            res.render("flashcards", { flashcards: qList.map((q, i) => ({ question: q, answer: aList[i] })) });
+
 
         } catch (error) {
             console.error("Error processing PDF:", error);
