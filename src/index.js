@@ -7,6 +7,10 @@ const collection = require("./config");
 const multer = require("multer")
 const app = express(); // Creates express application
 const Groq = require('groq-sdk');
+<<<<<<< HEAD
+=======
+const pdfIn = require('pdfjs-dist');
+>>>>>>> 3bf9ef7d82256b7ba300d9d2e16129ae2a01ba3c
 
 
 
@@ -38,6 +42,7 @@ app.get('/signup', (req, res) => { // Sign-up request/respond function
 app.get('/pricing', (req, res) => { // pricing route
     res.render("pricing");
 });
+<<<<<<< HEAD
 
 app.get('/flashcards', (req, res) => { // pricing route
     res.render("flashcards");
@@ -47,6 +52,9 @@ app.get('/flashcards', (req, res) => { // pricing route
 
 
 
+=======
+  
+>>>>>>> 3bf9ef7d82256b7ba300d9d2e16129ae2a01ba3c
 // File upload
 let storage = multer.diskStorage({
     destination: function(req, file, callback) {
@@ -62,6 +70,19 @@ let storage = multer.diskStorage({
     res.render('index')
    })
  
+   async function readPdf(url) {
+    const pdf = await pdfIn.getDocument(url).promise;
+    let fullText = "";
+  
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const textContent = await page.getTextContent();
+      const pageText = textContent.items.map(item => item.str).join(" ");
+      fullText += pageText + "\n";
+    }
+    return fullText;
+  }
+
   app.post('/', function(req, res) {
     let upload = multer({
         storage: storage,
@@ -74,6 +95,9 @@ let storage = multer.diskStorage({
             callback(null, true)
         }
     }).single('userFile');
+
+    let pdfString = 0;
+
     upload(req, res, function(err) {
         if(err) {
             return res.status(500).send("Error uploading file" + err);
@@ -83,8 +107,13 @@ let storage = multer.diskStorage({
 
         // Do whatever you need to do with the file (e.g., processing or sending it back to the user)
         // Convert file into string for function input here
+<<<<<<< HEAD
         // File can be deleted after conversion to string   
 
+=======
+        // File can be deleted after conversion to string
+        pdfString = readPdf('./uploads');
+>>>>>>> 3bf9ef7d82256b7ba300d9d2e16129ae2a01ba3c
 
 
         // Backend end
@@ -101,6 +130,7 @@ let storage = multer.diskStorage({
 
 
         res.render("flashcards")
+        return pdfString;
     });
   });
 
@@ -143,38 +173,39 @@ app.post('flashcards', function(req, res) {
       apiKey: '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',
     });
     
-    async function runModel() {
+    async function runModel(pdf) {
       try {
         const chatCompletion = await groq.chat.completions.create({
           model: 'mixtral-8x7b-32768',
-          messages: [{ role: 'user', content: `Read the name of the PDF variable provided: ${pdf}` }],
+          messages: [{ role: 'user', content: `Create a list of study questions and answers from the provided text: ${pdf}` }],
+          //`Read the name of the PDF variable provided: ${pdf}`
         });
-        // let str = console.log(chatCompletion.choices[0].message.content);
-        // return str
         console.log(chatCompletion.choices[0].message.content); 
+        let str = chatCompletion.choices[0].message.content;
+        return str
       } catch (error) {
         console.error('Error:', error);
       }
     }
-    // Change condition? PDF may be empty very quickly
-    while(pdf != isEmptyObj()) {
-    
-      runModel();
-      //str = runModel();
-      //qna(str);
+    let pdfOut;
+    let arrayOut;
+    let qList;
+    let aList;
+    // If pdfString is loaded properly, groq and qna will be run
+    if(typeof pdfString == "string") {
+      pdfOut = runModel();
+      arrayOut = qna(pdfOut);
+      // ARRAYS FOR USE IN NOTECARDS
+      qList = arrayOut[0];
+      aList = arrayOut[1];
+    }
+    else {
+      console.log("Error: No PDF detected");
     };
     
     
-    let inputString = "Here are the study questions and answers based on the notes:\nQ: How does the film portray the human cost of war, particularly through the lens of children?\nA: The film portrays the human cost of war brutally and realistically, showing the intense shock and trauma of losing family at a young age.\nQ: What do we see through the lens of children in the film?\nA: We see the unnecessary death toll of war, as well as the possibility of losing family without warning or preparation, which is life-changing for young children."
-    let qList;
-    let aList;
-    let arrayOut;
-    arrayOut = qna(inputString)
-    qList = arrayOut[0];
-    aList = arrayOut[1];
+    //let inputString = "Here are the study questions and answers based on the notes:\nQ: How does the film portray the human cost of war, particularly through the lens of children?\nA: The film portrays the human cost of war brutally and realistically, showing the intense shock and trauma of losing family at a young age.\nQ: What do we see through the lens of children in the film?\nA: We see the unnecessary death toll of war, as well as the possibility of losing family without warning or preparation, which is life-changing for young children."
     //console.log(arrayOut);
-    console.log(qList);
-    console.log(aList);
 
 
 });
