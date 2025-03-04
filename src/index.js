@@ -105,7 +105,7 @@ let storage = multer.diskStorage({
             console.log("Extracted Text from PDF:", pdfString);  // Debugging output
 
             // Send extracted text to AI model
-            const groq = new Groq({ apiKey: 'YOUR_GROQ_API_KEY' });
+            const groq = new Groq({ apiKey: sk-abcdef1234567890 });
             const chatCompletion = await groq.chat.completions.create({
                 model: 'mixtral-8x7b-32768',
                 messages: [{ role: 'user', content: `Create a list of study questions and answers from this text: ${pdfString}` }]
