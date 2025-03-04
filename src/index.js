@@ -163,9 +163,9 @@ app.post('/', function (req, res) {
             });
 
             // Render flashcards.ejs with Q&A data
-            console.log("Raw Q&A String Before Parsing:\n", qnaString);
+            //console.log("Raw Q&A String Before Parsing:\n", qnaString);
 
-            console.log("Flashcards to be sent:", flashcards);
+            //console.log("Flashcards to be sent:", flashcards);
 
             res.render("flashcards", { flashcards: flashcards });
 
