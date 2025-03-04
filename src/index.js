@@ -7,10 +7,8 @@ const collection = require("./config");
 const multer = require("multer")
 const app = express(); // Creates express application
 const Groq = require('groq-sdk');
-<<<<<<< HEAD
-=======
 const pdfIn = require('pdfjs-dist');
->>>>>>> 3bf9ef7d82256b7ba300d9d2e16129ae2a01ba3c
+const uploadDir = path.join(__dirname, 'uploads');
 
 
 
@@ -42,19 +40,7 @@ app.get('/signup', (req, res) => { // Sign-up request/respond function
 app.get('/pricing', (req, res) => { // pricing route
     res.render("pricing");
 });
-<<<<<<< HEAD
-
-app.get('/flashcards', (req, res) => { // pricing route
-    res.render("flashcards");
-});
-
-    
-
-
-
-=======
   
->>>>>>> 3bf9ef7d82256b7ba300d9d2e16129ae2a01ba3c
 // File upload
 let storage = multer.diskStorage({
     destination: function(req, file, callback) {
@@ -107,13 +93,8 @@ let storage = multer.diskStorage({
 
         // Do whatever you need to do with the file (e.g., processing or sending it back to the user)
         // Convert file into string for function input here
-<<<<<<< HEAD
         // File can be deleted after conversion to string   
 
-=======
-        // File can be deleted after conversion to string
-        pdfString = readPdf('./uploads');
->>>>>>> 3bf9ef7d82256b7ba300d9d2e16129ae2a01ba3c
 
 
         // Backend end
