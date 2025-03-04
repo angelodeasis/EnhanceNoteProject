@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="styles.css">
     <script defer src="flashcards.js"></script>
 </head>
+
+<div class="download-section text-center mt-5">
+    <button id="downloadBtn" class="btn btn-success">Download Q&A</button>
+</div>
+
+
+
 <body>
 
     <!-- Navbar -->
@@ -55,6 +62,37 @@
             <button class="btn btn-primary" id="nextButton">Next</button>
         </div>
     </div>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const downloadBtn = document.getElementById("downloadBtn");
+            let flashcards = <%- JSON.stringify(flashcards) %>;  // Get flashcard data from the backend
+    
+            downloadBtn.addEventListener("click", () => {
+                let textContent = "";
+    
+                flashcards.forEach((card, index) => {
+                    textContent += `${index + 1}. Q: ${card.question}\nA: ${card.answer}\n\n`;
+                });
+    
+                // Create a Blob (file-like object) with the text content
+                const blob = new Blob([textContent], { type: "text/plain" });
+                const url = URL.createObjectURL(blob);
+    
+                // Create a temporary link and trigger the download
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "Flashcards_Q&A.txt";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+        });
+    </script>
+
+    
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {

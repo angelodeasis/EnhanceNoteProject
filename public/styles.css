@@ -144,3 +144,27 @@ header h1, header p {
   transition: all 0.3s ease;
 }
 
+.download-section {
+  margin-top: 20px;
+}
+
+#downloadBtn {
+  padding: 12px 24px;
+  font-size: 1rem;
+  border-radius: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+#downloadBtn:hover {
+  background-color: #218838;
+  transform: scale(1.05);
+}
+
+.download-section {
+  margin-top: 60px; /* Moves the button further down */
+  margin-bottom: 30px; /* Adds space at the bottom */
+}
