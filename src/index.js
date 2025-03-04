@@ -8,7 +8,8 @@ const multer = require("multer")
 const app = express(); // Creates express application
 const Groq = require('groq-sdk');
 const pdfIn = require('pdfjs-dist');
-const uploadDir = path.join(__dirname, 'uploads');
+const uploadDir = path.join(__dirname, '../uploads'); // Go up one level
+
 
 
 
@@ -56,64 +57,100 @@ let storage = multer.diskStorage({
     res.render('index')
    })
  
-   async function readPdf(url) {
-    const pdf = await pdfIn.getDocument(url).promise;
-    let fullText = "";
-  
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const textContent = await page.getTextContent();
-      const pageText = textContent.items.map(item => item.str).join(" ");
-      fullText += pageText + "\n";
-    }
-    return fullText;
-  }
+   async function readPdf(filePath) {
+    const absolutePath = path.resolve(filePath);      // Get absolute path
+    const fileUrl = `file://${absolutePath}`;         // Convert to file URL
 
-  app.post('/', function(req, res) {
+    try {
+        const pdf = await pdfIn.getDocument(fileUrl).promise;
+        let fullText = "";
+
+        for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i);
+            const textContent = await page.getTextContent();
+            const pageText = textContent.items.map(item => item.str).join(" ");
+            fullText += pageText + "\n";
+        }
+
+        return fullText;
+    } catch (error) {
+        console.error("Error reading PDF:", error);
+        throw error;
+    }
+}
+
+
+  app.post('/', function (req, res) {
     let upload = multer({
         storage: storage,
-        fileFilter: function(req, file, callback) {
-            let ext = path.extname(file.originalname)
+        fileFilter: function (req, file, callback) {
+            let ext = path.extname(file.originalname);
             if (ext !== '.pdf') {
-                return callback(res.end('Only pdf files are allowed'), null)
-
+                return callback(res.end('Only pdf files are allowed'), null);
             }
-            callback(null, true)
+            callback(null, true);
         }
     }).single('userFile');
 
-    let pdfString = 0;
-
-    upload(req, res, function(err) {
-        if(err) {
-            return res.status(500).send("Error uploading file" + err);
+    upload(req, res, async function (err) {
+        if (err) {
+            return res.status(500).send("Error uploading file: " + err);
         }
 
         const uploadedFilePath = path.join(uploadDir, req.file.filename);
 
-        // Do whatever you need to do with the file (e.g., processing or sending it back to the user)
-        // Convert file into string for function input here
-        // File can be deleted after conversion to string   
+        try {
+            // Convert PDF to text
+            let pdfString = await readPdf(uploadedFilePath);
+            console.log("Extracted Text from PDF:", pdfString);  // Debugging output
 
+            // Send extracted text to AI model
+            const groq = new Groq({ apiKey: 'YOUR_GROQ_API_KEY' });
+            const chatCompletion = await groq.chat.completions.create({
+                model: 'mixtral-8x7b-32768',
+                messages: [{ role: 'user', content: `Create a list of study questions and answers from this text: ${pdfString}` }]
+            });
 
+            let qnaString = chatCompletion.choices[0].message.content;
+            console.log("Generated Q&A:", qnaString);  // Debugging output
 
-        // Backend end
-        // Example: Here we can delete the file after use.
+            // Function to split Q&A into arrays
+            function parseQnA(text) {
+                let qArray = [];
+                let aArray = [];
+                let lines = text.split("\n");
 
-        // Delete the file after use (e.g., after sending the response or processing)
-        // fs.unlink(uploadedFilePath, function(deleteErr) {
-        //     if (deleteErr) {
-        //         console.log('Error deleting file:', deleteErr);
-        //     } else {
-        //         console.log('File deleted successfully.');
-        //     }
-        // });
+                for (let i = 0; i < lines.length; i++) {
+                    if (lines[i].startsWith("Q:")) {
+                        qArray.push(lines[i].replace("Q:", "").trim());
+                    } else if (lines[i].startsWith("A:")) {
+                        aArray.push(lines[i].replace("A:", "").trim());
+                    }
+                }
 
+                return qArray.map((q, index) => ({
+                    question: q,
+                    answer: aArray[index] || "No answer available"
+                }));
+            }
 
-        res.render("flashcards")
-        return pdfString;
+            let flashcards = parseQnA(qnaString);
+
+            // Delete file after processing (optional)
+            fs.unlink(uploadedFilePath, (deleteErr) => {
+                if (deleteErr) console.log("Error deleting file:", deleteErr);
+            });
+
+            // Render flashcards.ejs with Q&A data
+            res.render("flashcards", { flashcards });
+
+        } catch (error) {
+            console.error("Error processing PDF:", error);
+            res.status(500).send("Error processing file.");
+        }
     });
-  });
+});
+
 
 
 // Backend for Handling PDF
