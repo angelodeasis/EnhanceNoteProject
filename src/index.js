@@ -82,7 +82,7 @@ let storage = multer.diskStorage({
 }
 
 
-  app.post('/', function (req, res) {
+app.post('/', function (req, res) {
     let upload = multer({
         storage: storage,
         fileFilter: function (req, file, callback) {
@@ -123,20 +123,37 @@ let storage = multer.diskStorage({
                 let qArray = [];
                 let aArray = [];
                 let lines = text.split("\n");
-
-                for (let i = 0; i < lines.length; i++) {
-                    if (lines[i].startsWith("Q:")) {
-                        qArray.push(lines[i].replace("Q:", "").trim());
-                    } else if (lines[i].startsWith("A:")) {
-                        aArray.push(lines[i].replace("A:", "").trim());
+                
+                let currentQuestion = null;
+                let currentAnswer = [];
+            
+                lines.forEach(line => {
+                    line = line.trim();
+                    
+                    if (/^\d+\./.test(line)) {  // Detects numbered questions (e.g., "1. What is photosynthesis?")
+                        if (currentQuestion && currentAnswer.length > 0) {
+                            qArray.push(currentQuestion);
+                            aArray.push(currentAnswer.join(" "));  // Combine multi-line answers
+                        }
+                        currentQuestion = line.replace(/^\d+\.\s*/, "");  // Remove numbering
+                        currentAnswer = [];
+                    } else if (currentQuestion) {
+                        currentAnswer.push(line.replace(/^A:\s*/, "").trim()); // Remove "A:" prefix if present
                     }
+                });
+            
+                // Add the last Q&A pair
+                if (currentQuestion && currentAnswer.length > 0) {
+                    qArray.push(currentQuestion);
+                    aArray.push(currentAnswer.join(" "));
                 }
-
+            
                 return qArray.map((q, index) => ({
                     question: q,
                     answer: aArray[index] || "No answer available"
                 }));
             }
+            
 
             let flashcards = parseQnA(qnaString);
 
@@ -146,8 +163,11 @@ let storage = multer.diskStorage({
             });
 
             // Render flashcards.ejs with Q&A data
-            res.render("flashcards", { flashcards: qList.map((q, i) => ({ question: q, answer: aList[i] })) });
+            console.log("Raw Q&A String Before Parsing:\n", qnaString);
 
+            console.log("Flashcards to be sent:", flashcards);
+
+            res.render("flashcards", { flashcards: flashcards });
 
         } catch (error) {
             console.error("Error processing PDF:", error);
@@ -155,6 +175,7 @@ let storage = multer.diskStorage({
         }
     });
 });
+
 
 
 
