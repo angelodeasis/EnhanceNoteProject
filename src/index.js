@@ -5,7 +5,6 @@ const collection = require("./config");
 const multer = require("multer");
 const app = express(); // Creates express application
 const Groq = require('groq-sdk');
-const pdfIn = require('pdfjs-dist');
 
 // IMPORTANT: Set up Groq using Environment Variables for security
 // Make sure to add GROQ_API_KEY to your Vercel Dashboard -> Project Settings -> Environment Variables
@@ -54,8 +53,12 @@ const upload = multer({
 }).single('userFile');
 
 // Read PDF directly from RAM buffer instead of local disk
+// Read PDF directly from RAM buffer instead of local disk
 async function readPdfFromBuffer(buffer) {
     try {
+        // FIX: Dynamically import the ESM module inside our async function
+        const pdfIn = await import('pdfjs-dist');
+
         // Convert the Node buffer into a Uint8Array for pdfjs-dist
         const uint8Array = new Uint8Array(buffer);
         const pdf = await pdfIn.getDocument({ data: uint8Array }).promise;
