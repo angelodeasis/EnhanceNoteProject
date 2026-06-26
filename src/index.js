@@ -1,6 +1,6 @@
 const express = require("express"); // express model imported
 const path = require("path"); // built-in path module imported
-const bcrypt = require("bcrypt"); // bcrypt model imported
+const bcrypt = require("bcryptjs"); // bcrypt model imported
 const collection = require("./config"); 
 // const animation = require("./flashcards")
 // const backend = require("./backend");
