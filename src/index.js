@@ -57,7 +57,7 @@ const upload = multer({
 async function readPdfFromBuffer(buffer) {
     try {
         // FIX: Dynamically import the ESM module inside our async function
-        const pdfIn = await import('pdfjs-dist');
+        const pdfIn = await import('pdfjs-dist/legacy/build/pdf.mjs');
 
         // Convert the Node buffer into a Uint8Array for pdfjs-dist
         const uint8Array = new Uint8Array(buffer);
@@ -93,9 +93,15 @@ app.post('/', function (req, res) {
             let pdfString = await readPdfFromBuffer(req.file.buffer);
             console.log("Extracted Text from PDF successfully.");
 
+            // Groq has a context limit; cap the input so large PDFs don't 413/400.
+            const MAX_CHARS = 24000;
+            if (pdfString.length > MAX_CHARS) {
+                pdfString = pdfString.slice(0, MAX_CHARS);
+            }
+
             // Send extracted text to AI model
             const chatCompletion = await groq.chat.completions.create({
-                model: 'mixtral-8x7b-32768',
+                model: 'llama-3.3-70b-versatile',
                 messages: [{ role: 'user', content: `Create a list of study questions and answers from this text: ${pdfString}` }]
             });
 
@@ -141,7 +147,7 @@ app.post('/', function (req, res) {
 
         } catch (error) {
             console.error("Error processing PDF:", error);
-            res.status(500).send("Error processing file.");
+            res.status(500).send("Error processing file: " + error.message);
         }
     });
 });
@@ -167,7 +173,7 @@ app.post('/flashcards', function(req, res) {
     async function runModel(pdf) {
       try {
         const chatCompletion = await groq.chat.completions.create({
-          model: 'mixtral-8x7b-32768',
+          model: 'llama-3.3-70b-versatile',
           messages: [{ role: 'user', content: `Create a list of study questions and answers from the provided text: ${pdf}` }],
         });
         return chatCompletion.choices[0].message.content;
